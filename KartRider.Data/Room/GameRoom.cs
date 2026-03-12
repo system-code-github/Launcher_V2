@@ -12,7 +12,6 @@ public class GameRoom
     public string RoomName { get; set; }
     public uint track { get; set; } = 0;
     public uint trackTemp { get; set; } = 0;
-    public byte[] RoomUnkBytes { get; set; } = new byte[32];
     public uint StartTicks { get; set; } = 0;
     public uint EndTicks { get; set; } = 0;
     public byte SpeedType { get; set; } = 0;
@@ -201,6 +200,15 @@ public class GameRoom
 
         if (GetPlayerCount() > 0)
         {
+            for (byte i = 0; i < 8; i++)
+            {
+                if (_slots[i] != null)
+                {
+                    RoomMaster = i;
+                    Player p = (Player)_slots[i];
+                    p.PlayerType = 2;
+                }
+            }
             MultyPlayer.GrSlotDataPacket(RoomId);
         }
 

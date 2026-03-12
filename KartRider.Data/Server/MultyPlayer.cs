@@ -76,18 +76,17 @@ public static class MultyPlayer
         return ranks;
     }
 
-    static void Set_settleTrigger(SessionGroup Parent, string nickname, fileName filename)
+    static void Set_settleTrigger(SessionGroup Parent, int roomId)
     {
         var onceTimer = new System.Timers.Timer();
         onceTimer.Interval = 10000;
-        onceTimer.Elapsed += new System.Timers.ElapsedEventHandler((s, _event) => settleTrigger(Parent, nickname, filename, s, _event));
+        onceTimer.Elapsed += new System.Timers.ElapsedEventHandler((s, _event) => settleTrigger(Parent, roomId, s, _event));
         onceTimer.AutoReset = false;
         onceTimer.Start();
     }
 
-    static void settleTrigger(SessionGroup Parent, string nickname, fileName filename, object sender, System.Timers.ElapsedEventArgs e)
+    static void settleTrigger(SessionGroup Parent, int roomId, object sender, System.Timers.ElapsedEventArgs e)
     {
-        int roomId = RoomManager.TryGetRoomId(nickname);
         var room = RoomManager.GetRoom(roomId);
         if (room == null)
         {
@@ -99,13 +98,7 @@ public static class MultyPlayer
             outPacket.WriteByte(room.GameType);
             outPacket.WriteInt();
             outPacket.WriteInt();
-            for (int i = 0; i < 8; i++)
-            {
-                if (RoomManager.TryGetSlotDetail(roomId, (byte)i) is Player p)
-                {
-                    p.Session.Client.Send(outPacket);
-                }
-            }
+            BroadCast(roomId, outPacket);
         }
         using (OutPacket outPacket = new OutPacket("GameResultPacket"))
         {
@@ -286,14 +279,7 @@ public static class MultyPlayer
             Console.WriteLine("红队得分 {0} 蓝队得分 {1}", redTeam, blueTeam);
             outPacket.WriteBytes(new byte[34]);
             outPacket.WriteHexString("FF FF FF FF 00 00 00 00 00");
-            for (int i = 0; i < 8; i++)
-            {
-                if (RoomManager.TryGetSlotDetail(roomId, (byte)i) is Player p4)
-                {
-                    Console.WriteLine("EndPlayer = {0}", p4.Nickname);
-                    p4.Session.Client.Send(outPacket);
-                }
-            }
+            BroadCast(roomId, outPacket);
         }
         using (OutPacket outPacket = new OutPacket("GameControlPacket"))
         {
@@ -301,14 +287,7 @@ public static class MultyPlayer
             outPacket.WriteByte(0);
             outPacket.WriteLong(room.EndTicks + 5000);
             //Parent.Client.Send(outPacket);
-            for (int i = 0; i < 8; i++)
-            {
-                if (RoomManager.TryGetSlotDetail(roomId, (byte)i) is Player p)
-                {
-                    Console.WriteLine("EndPlayer = {0}", p.Nickname);
-                    p.Session.Client.Send(outPacket);
-                }
-            }
+            BroadCast(roomId, outPacket);
         }
         Console.WriteLine("EndTicks = {0}", room.EndTicks + 5000);
     }
@@ -360,16 +339,9 @@ public static class MultyPlayer
                                     oPacket.WriteByte(0);
                                     oPacket.WriteUInt(room.EndTicks);
                                     //Parent.Client.Send(oPacket);
-                                    for (int i = 0; i < 8; i++)
-                                    {
-                                        if (RoomManager.TryGetSlotDetail(roomId, (byte)i) is Player p)
-                                        {
-                                            Console.WriteLine("EndPlayer = {0}", p.Nickname);
-                                            p.Session.Client.Send(oPacket);
-                                        }
-                                    }
+                                    BroadCast(roomId, oPacket, nickname);
                                 }
-                                Set_settleTrigger(Parent, nickname, filename);
+                                Set_settleTrigger(Parent, roomId);
                             }
                         }
                         Console.WriteLine("GameSlotPacket, Arrivaled. Ticks = {0}", ArrivalTicks);
@@ -466,14 +438,7 @@ public static class MultyPlayer
                     oPacket.WriteByte(0);
                     oPacket.WriteUInt(room.StartTicks);
                     //Parent.Client.Send(oPacket);
-                    for (int i = 0; i < 8; i++)
-                    {
-                        if (RoomManager.TryGetSlotDetail(roomId, (byte)i) is Player p)
-                        {
-                            Console.WriteLine("StartPlayer = {0}", p.Nickname);
-                            p.Session.Client.Send(oPacket);
-                        }
-                    }
+                    BroadCast(roomId, oPacket);
                 }
                 room.TimeData = new Dictionary<int, uint>();
                 room.EndTicks = 0;
@@ -509,16 +474,9 @@ public static class MultyPlayer
                         oPacket.WriteByte(0);
                         oPacket.WriteUInt(room.EndTicks);
                         //Parent.Client.Send(oPacket);
-                        for (int i = 0; i < 8; i++)
-                        {
-                            if (RoomManager.TryGetSlotDetail(roomId, (byte)i) is Player p)
-                            {
-                                Console.WriteLine("EndPlayer = {0}", p.Nickname);
-                                p.Session.Client.Send(oPacket);
-                            }
-                        }
+                        BroadCast(roomId, oPacket);
                     }
-                    Set_settleTrigger(Parent, nickname, filename);
+                    Set_settleTrigger(Parent, roomId);
                 }
             }
             return;
@@ -646,8 +604,8 @@ public static class MultyPlayer
             Console.WriteLine("AiCount = {0}", AiCount);
             iPacket.ReadInt();
             iPacket.ReadInt();
-            byte[] RoomUnkBytes = iPacket.ReadBytes(32);
-            var unk2 = iPacket.ReadBytes(29);
+            iPacket.ReadBytes(32);
+            iPacket.ReadBytes(29);
             byte AiSwitch = iPacket.ReadByte();
             Console.WriteLine("AiSwitch = {0}", AiSwitch);
             using (OutPacket oPacket = new OutPacket("ChCreateRoomReplyPacket"))
@@ -686,7 +644,6 @@ public static class MultyPlayer
                 Room.Lock = 1;
             }
             Room.LockPwd = Password;
-            Room.RoomUnkBytes = RoomUnkBytes;
             Room.SpeedType = roomData.SpeedType;
             Room.GameType = roomData.GameType;
             Room.RandomTrackGameType = roomData.RandomTrackGameType;
@@ -715,8 +672,6 @@ public static class MultyPlayer
                 return;
             }
             room.track = iPacket.ReadUInt();
-            iPacket.ReadInt();
-            room.RoomUnkBytes = iPacket.ReadBytes(32);
             Console.WriteLine("Gr Track Changed : {0}", RandomTrack.GetTrackName(room.track));
             return;
         }
@@ -736,38 +691,27 @@ public static class MultyPlayer
                 Console.WriteLine("GetPlayer Failed, roomId = {0}, nickname = {1}", roomId, nickname);
                 return;
             }
-            player.PlayerType = iPacket.ReadInt();
 
-            for (int i = 0; i < 8; i++)
+            player.PlayerType = iPacket.ReadInt();
+            using (OutPacket oPacket = new OutPacket("GrReplySetSlotStatePacket"))
             {
-                if (RoomManager.TryGetSlotDetail(roomId, (byte)i) is Player p)
-                {
-                    GrSlotDataPacket(roomId);
-                    using (OutPacket oPacket = new OutPacket("GrReplySetSlotStatePacket"))
-                    {
-                        oPacket.WriteUInt(Adler32Helper.GenerateAdler32_ASCII(nickname, 0));
-                        oPacket.WriteByte((byte)p.PlayerType);
-                        oPacket.WriteInt(p.SlotId);
-                        oPacket.WriteInt(p.PlayerType);
-                        p.Session.Client.Send(oPacket);
-                    }
-                }
+                oPacket.WriteUInt(Adler32Helper.GenerateAdler32_ASCII(nickname, 0));
+                oPacket.WriteByte((byte)player.PlayerType);
+                oPacket.WriteInt(player.SlotId);
+                oPacket.WriteInt(player.PlayerType);
+                player.Session.Client.Send(oPacket);
             }
-            //GrSlotDataPacket(Parent, nickname);
-            //GrSlotStatePacket(Parent, Data);
-            //GrReplySetSlotStatePacket(Parent, nickname, Data);
+            GrSlotDataPacket(roomId);
             return;
         }
         else if (hash == Adler32Helper.GenerateAdler32_ASCII("GrRequestClosePacket"))
         {
-            int slotId = iPacket.ReadInt();
             using (OutPacket oPacket = new OutPacket("GrReplyClosePacket"))
             {
-                //oPacket.WriteHexString("ff 76 05 5d 01");
                 oPacket.WriteUInt(Adler32Helper.GenerateAdler32_ASCII(nickname, 0));
-                oPacket.WriteByte(1);
-                oPacket.WriteInt(slotId);
-                oPacket.WriteInt(slotId);
+                oPacket.WriteByte(0);
+                oPacket.WriteInt(0);
+                oPacket.WriteInt(0);
                 oPacket.WriteInt(0);
                 oPacket.WriteInt(0);
                 Parent.Client.Send(oPacket);
@@ -801,7 +745,7 @@ public static class MultyPlayer
                         GrSessionDataPacket(p.Nickname, oPacket);
 
                         oPacket.WriteUInt(Adler32Helper.GenerateAdler32(Encoding.ASCII.GetBytes("GrSlotDataPacket")));
-                        GrSlotDataPacket(roomId, oPacket, true);
+                        GrSlotDataPacket(nickname, roomId, oPacket, true);
                         oPacket.WriteInt();
 
                         //kart data
@@ -1105,6 +1049,47 @@ public static class MultyPlayer
             }
             return;
         }
+        else if (hash == Adler32Helper.GenerateAdler32_ASCII("PqChangeRoomInfoPacket"))
+        {
+            string RoomName = iPacket.ReadString();
+            string RoomPassword = iPacket.ReadString();
+
+            int LimitTime = iPacket.ReadInt();
+            byte RKeyAllowed = iPacket.ReadByte();
+            int roomId = RoomManager.TryGetRoomId(nickname);
+            if (roomId == -1)
+            {
+                Console.WriteLine("TryGetRoomId Failed, nickname = {0}", nickname);
+                return;
+            }
+            var room = RoomManager.GetRoom(roomId);
+            if (room == null)
+            {
+                Console.WriteLine("GetRoom Failed, roomId = {0}", roomId);
+                return;
+            }
+            room.RoomName = RoomName;
+            if (RoomPassword.Length > 0)
+            {
+                room.Lock = 1;
+            }
+            else
+            {
+                room.Lock = 0;
+            }
+            room.LockPwd = RoomPassword;
+
+            using (OutPacket outPacket = new OutPacket("PrChangeRoomInfoPacket"))
+            {
+                outPacket.WriteBool(true);
+                outPacket.WriteString(RoomName);
+                outPacket.WriteString(RoomPassword);
+                outPacket.WriteInt(LimitTime);
+                outPacket.WriteByte(RKeyAllowed);
+                BroadCast(roomId, outPacket);
+            }
+            return;
+        }
         else
         {
             return;
@@ -1119,26 +1104,22 @@ public static class MultyPlayer
             {
                 using (OutPacket outPacket = new OutPacket("GrSlotDataPacket"))
                 {
-                    GrSlotDataPacket(roomId, outPacket);
+                    GrSlotDataPacket(p.Nickname, roomId, outPacket);
                     p.Session.Client.Send(outPacket);
                 }
             }
         }
     }
 
-    static void GrSlotDataPacket(int roomId, OutPacket outPacket, bool enter = false)
+    static void GrSlotDataPacket(string nickname, int roomId, OutPacket outPacket, bool enter = false)
     {
         var room = RoomManager.GetRoom(roomId);
         outPacket.WriteUInt(room.track); // track name hash
         outPacket.WriteInt(0);
-        outPacket.WriteBytes(room.RoomUnkBytes); // 32
+        outPacket.WriteBytes(new byte[32]); // 32 room.RoomUnkBytes
         outPacket.WriteInt(room.RoomMaster); // RoomMaster
-        outPacket.WriteInt(0); // 2
-        outPacket.WriteInt(0); // outPacket.WriteShort(); outPacket.WriteShort(3);
-        outPacket.WriteShort(0); // 797
-        outPacket.WriteByte(0);
-        for (int i = 0; i < 4; i++) outPacket.WriteByte();
-        for (int i = 0; i < 4; i++) outPacket.WriteInt();
+
+        outPacket.WriteBytes(new byte[31]);
 
         /* ---- Player ---- */
         Console.WriteLine("PlayerCount = {0}", room.GetPlayerCount());
@@ -1178,15 +1159,15 @@ public static class MultyPlayer
                     outPacket.WriteByte(0);
                 }
                 outPacket.WriteByte(p.SlotId);
-                outPacket.WriteByte();
-                for (int j = 0; j < 8; j++) outPacket.WriteInt();
-                outPacket.WriteInt(1500); //outPacket.WriteInt(1500);
-                outPacket.WriteInt(1500); //outPacket.WriteInt(2000);
-                outPacket.WriteInt(0); //outPacket.WriteInt();
-                outPacket.WriteInt(2000); //outPacket.WriteInt(2000);
-                outPacket.WriteInt(5); //outPacket.WriteInt(5);
 
-                outPacket.WriteHexString("FF 00 00 00"); //"FF 00 00 01"
+                outPacket.WriteBytes(new byte[33]);
+
+                outPacket.WriteInt(1500);
+                outPacket.WriteInt(1499);
+                outPacket.WriteInt(0);
+                outPacket.WriteInt(2000);
+                outPacket.WriteInt(5);
+                outPacket.WriteHexString("FF 00 00 00");
 
                 outPacket.WriteByte(RiderData.RiderSchool.catLevel); //3
                 if (ProfileService.ProfileConfigs[p.Nickname].Rider.ClubMark_LOGO == 0)
@@ -1199,12 +1180,7 @@ public static class MultyPlayer
                     outPacket.WriteString(ProfileService.ProfileConfigs[p.Nickname].Rider.ClubName);
                     outPacket.WriteInt(ProfileService.ProfileConfigs[p.Nickname].Rider.ClubMark_LOGO);
                 }
-                outPacket.WriteInt();
-                outPacket.WriteInt();
-                outPacket.WriteInt();
-                outPacket.WriteByte();
-                outPacket.WriteInt();
-                outPacket.WriteShort();
+                outPacket.WriteBytes(new byte[19]);
             }
         }
 
@@ -1239,16 +1215,6 @@ public static class MultyPlayer
         Position(roomId, outPacket);
     }
 
-    static void GrSlotStatePacket(SessionGroup Parent, int Data)
-    {
-        using (OutPacket oPacket = new OutPacket("GrSlotStatePacket"))
-        {
-            oPacket.WriteInt(Data);
-            oPacket.WriteBytes(new byte[60]);
-            Parent.Client.Send(oPacket);
-        }
-    }
-
     static void GrSessionDataPacket(SessionGroup Parent, string nickname)
     {
         using (OutPacket oPacket = new OutPacket("GrSessionDataPacket"))
@@ -1277,6 +1243,20 @@ public static class MultyPlayer
         outPacket.WriteByte(0);
         outPacket.WriteByte(0);
         outPacket.WriteByte(0);
+    }
+
+    static void BroadCast(int roomId, OutPacket outPacket, string Self = "")
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            if (RoomManager.TryGetSlotDetail(roomId, (byte)i) is Player p)
+            {
+                if (Self != p.Nickname)
+                {
+                    p.Session.Client.Send(outPacket);
+                }
+            }
+        }
     }
 
     // 添加指定数量的 Ai
