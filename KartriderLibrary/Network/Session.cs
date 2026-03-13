@@ -128,7 +128,7 @@ namespace KartRider.Common.Network
                 else if ((int)next.Buffer.Length >= next.Length)
                 {
                     IPEndPoint clientEndPoint = this._socket.RemoteEndPoint as IPEndPoint;
-                    if (clientEndPoint == null) return;
+                    if (clientEndPoint == null) { this.Disconnect(); return; }
                     string clientId = ClientManager.GetClientId(clientEndPoint);
                     var clientGroup = ClientManager.ClientGroups[clientId];
                     byte[] buffer = next.Buffer;
@@ -211,7 +211,6 @@ namespace KartRider.Common.Network
                         {
                             // 读取到0字节，说明客户端主动断开
                             Console.WriteLine("客户端主动断开连接");
-                            ClientManager.RemoveClient(this._socket);
                             this.Disconnect();
                             return;
                         }
