@@ -58,8 +58,8 @@ namespace KartRider
         public static void Start()
         {
             // 启动服务端
-            var server1 = new UdpServer("服务端1", 39311);
-            var server2 = new UdpServer("服务端2", 39312);
+            var server1 = new UdpServer("P2P", ProfileService.SettingConfig.ServerPort);
+            var server2 = new UdpServer("UDP", (ushort)(ProfileService.SettingConfig.ServerPort + 1));
             server1.Start();
             server2.Start();
 

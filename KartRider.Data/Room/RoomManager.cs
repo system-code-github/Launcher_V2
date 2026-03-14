@@ -166,6 +166,24 @@ public static class RoomManager
         return detail;
     }
 
+    // 扩展：获取指定位置的详细成员信息（玩家昵称或AI属性）
+    public static object TryGetIdDetail(int roomId, int Id)
+    {
+        object detail = null;
+        if (!_rooms.TryGetValue(roomId, out var room))
+            return detail;
+
+        var member = room.GetIdMember(Id);
+        if (member == null)
+            return detail; // 空位置，detail为null
+
+        if (member is Player player)
+            detail = player; // 玩家
+        else if (member is Ai ai)
+            detail = ai; // AI返回完整对象（可按需简化）
+        return detail;
+    }
+
     public static Player GetPlayer(int roomId, string nickname)
     {
         if (string.IsNullOrEmpty(nickname))

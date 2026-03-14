@@ -23,7 +23,7 @@ namespace Profile
         /// <summary>
         /// 服务器端口
         /// </summary>
-        public ushort ServerPort { get; set; } = 39312;
+        public ushort ServerPort { get; set; } = 39311;
 
         /// <summary>
         /// 版本

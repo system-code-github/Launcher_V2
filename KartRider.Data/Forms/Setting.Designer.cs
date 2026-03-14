@@ -65,7 +65,7 @@ namespace KartRider
             ServerPort.Name = "ServerPort";
             ServerPort.Size = new System.Drawing.Size(114, 23);
             ServerPort.TabIndex = 3;
-            ServerPort.Text = "39312";
+            ServerPort.Text = "39311";
             // 
             // Port_label
             // 

@@ -17,6 +17,7 @@ public class GameRoom
     public byte SpeedType { get; set; } = 0;
     public byte GameType { get; set; } = 0;
     public int RoomMaster { get; set; } = 0;
+    public byte[] RoomData { get; set;} = new byte[32];
     public byte RandomTrackGameType { get; set; } = 0;
     public float redGauge { get; set; } = 0;
     public float blueGauge { get; set; } = 0;
@@ -94,6 +95,11 @@ public class GameRoom
     public RoomMember GetSlotMember(byte slotId)
     {
         return IsValidSlotId(slotId) ? _slots[slotId] : null;
+    }
+
+    public RoomMember GetIdMember(int Id)
+    {
+        return _slots.FirstOrDefault(x => x is Player player && player.ID == Id || x is Ai ai && ai.ID == Id) ?? null;
     }
 
     // 尝试添加玩家（成功后自动检查是否需要删除房间）
@@ -202,11 +208,11 @@ public class GameRoom
         {
             for (byte i = 0; i < 8; i++)
             {
-                if (_slots[i] != null)
+                if (_slots[i] is Player p)
                 {
-                    RoomMaster = i;
-                    Player p = (Player)_slots[i];
+                    RoomMaster = p.ID;
                     p.PlayerType = 2;
+                    break;
                 }
             }
             MultyPlayer.GrSlotDataPacket(RoomId);
