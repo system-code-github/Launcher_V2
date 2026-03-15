@@ -1249,9 +1249,9 @@ public static class MultyPlayer
                 {
                     outPacket.WriteByte(0);
                 }
-                outPacket.WriteInt(p.ID);
+                outPacket.WriteByte(p.SlotId);
 
-                outPacket.WriteBytes(new byte[30]);
+                outPacket.WriteBytes(new byte[33]);
 
                 outPacket.WriteInt(1500);
                 outPacket.WriteInt(1499);
