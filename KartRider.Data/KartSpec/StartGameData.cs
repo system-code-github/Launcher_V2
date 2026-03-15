@@ -97,19 +97,19 @@ namespace KartRider
         public static void GetKartSpac(OutPacket oPacket, string Nickname, byte StartTimeAttack_SpeedType)
         {
             var speedType = new SpeedType();
-            string version = "国服";
-            byte speed = 0;
-            int roomId = RoomManager.TryGetRoomId(Nickname);
-            if (roomId == -1)
-            {
-                version = ProfileService.SettingConfig.Version;
-                speed = ProfileService.SettingConfig.SpeedType;
-            }
-            else
-            {
-                var room = RoomManager.GetRoom(roomId);
-                speed = room.SpeedType;
-            }
+            string version = ProfileService.SettingConfig.Version;
+            byte speed = ProfileService.SettingConfig.SpeedType;
+            // int roomId = RoomManager.TryGetRoomId(Nickname);
+            // if (roomId == -1)
+            // {
+            //     version = ProfileService.SettingConfig.Version;
+            //     speed = ProfileService.SettingConfig.SpeedType;
+            // }
+            // else
+            // {
+            //     var room = RoomManager.GetRoom(roomId);
+            //     speed = room.SpeedType;
+            // }
             speedType.SpeedTypeData(version, speed);
 
             int StartPosition = oPacket.Position;

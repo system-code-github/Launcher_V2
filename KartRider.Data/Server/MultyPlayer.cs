@@ -683,6 +683,7 @@ public static class MultyPlayer
                 oPacket.WriteInt(player.PlayerType);
                 BroadCast(roomId, oPacket);
             }
+            GrSlotDataPacket(roomId);
             return;
         }
         else if (hash == Adler32Helper.GenerateAdler32_ASCII("GrRequestClosePacket"))
@@ -1194,16 +1195,10 @@ public static class MultyPlayer
 
     public static void GrSlotDataPacket(int roomId)
     {
-        for (int i = 0; i < 8; i++)
+        using (OutPacket outPacket = new OutPacket("GrSlotDataPacket"))
         {
-            if (RoomManager.TryGetSlotDetail(roomId, (byte)i) is Player p)
-            {
-                using (OutPacket outPacket = new OutPacket("GrSlotDataPacket"))
-                {
-                    GrSlotDataPacket(roomId, outPacket);
-                    p.Session.Client.Send(outPacket);
-                }
-            }
+            GrSlotDataPacket(roomId, outPacket);
+            BroadCast(roomId, outPacket);
         }
     }
 
@@ -1223,7 +1218,7 @@ public static class MultyPlayer
             var Object = RoomManager.TryGetIdDetail(roomId, i);
             if (Object is Player p)
             {
-                Console.WriteLine("Player Nickname = {0}, SlotId = {1}", p.Nickname, p.SlotId);
+                Console.WriteLine("Player Nickname = {0}, ID = {1}, SlotId = {2}", p.Nickname, p.ID, p.SlotId);
                 if (enter)
                 {
                     outPacket.WriteInt(3);
@@ -1254,9 +1249,9 @@ public static class MultyPlayer
                 {
                     outPacket.WriteByte(0);
                 }
-                outPacket.WriteByte(p.SlotId);
+                outPacket.WriteEncInt(p.ID);
 
-                outPacket.WriteBytes(new byte[33]);
+                outPacket.WriteBytes(new byte[30]);
 
                 outPacket.WriteInt(1500);
                 outPacket.WriteInt(1499);
