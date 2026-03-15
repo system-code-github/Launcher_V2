@@ -90,7 +90,6 @@ public static class MultyPlayer
         var room = RoomManager.GetRoom(roomId);
         if (room == null)
         {
-            Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
             return;
         }
         using (OutPacket outPacket = new OutPacket("GameNextStagePacket"))
@@ -322,7 +321,6 @@ public static class MultyPlayer
             var room = RoomManager.GetRoom(roomId);
             if (room == null)
             {
-                Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
                 return;
             }
             iPacket.ReadInt();
@@ -399,7 +397,6 @@ public static class MultyPlayer
             var room = RoomManager.GetRoom(roomId);
             if (room == null)
             {
-                Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
                 return;
             }
             var state = iPacket.ReadByte();
@@ -612,7 +609,6 @@ public static class MultyPlayer
             int roomId = RoomManager.TryGetRoomId(nickname);
             if (roomId == -1)
             {
-                Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
                 return;
             }
             GrSessionDataPacket(Parent, nickname);
@@ -626,7 +622,6 @@ public static class MultyPlayer
             var room = RoomManager.GetRoom(roomId);
             if (room == null)
             {
-                Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
                 return;
             }
             room.track = iPacket.ReadUInt();
@@ -640,7 +635,6 @@ public static class MultyPlayer
             var room = RoomManager.GetRoom(roomId);
             if (room == null)
             {
-                Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
                 return;
             }
 
@@ -684,7 +678,6 @@ public static class MultyPlayer
             var room = RoomManager.GetRoom(roomId);
             if (room == null)
             {
-                Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
                 return;
             }
 
@@ -773,7 +766,6 @@ public static class MultyPlayer
             var room = RoomManager.GetRoom(roomId);
             if (room == null)
             {
-                Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
                 return;
             }
             int Id = iPacket.ReadInt();
@@ -814,7 +806,6 @@ public static class MultyPlayer
             var room = RoomManager.GetRoom(roomId);
             if (room == null)
             {
-                Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
                 return;
             }
             var Id = iPacket.ReadInt();
@@ -847,7 +838,6 @@ public static class MultyPlayer
             var room = RoomManager.GetRoom(roomId);
             if (room == null)
             {
-                Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
                 return;
             }
             var team = iPacket.ReadByte();
@@ -885,7 +875,6 @@ public static class MultyPlayer
             var room = RoomManager.GetRoom(roomId);
             if (room == null)
             {
-                Console.WriteLine("CreateRoom Failed, roomId = {0}", roomId);
                 return;
             }
             var player = RoomManager.GetPlayer(roomId, nickname);
