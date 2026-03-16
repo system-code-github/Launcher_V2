@@ -577,6 +577,7 @@ public static class MultyPlayer
                 if (player == null)
                 {
                     Console.WriteLine("CreateRoom Failed");
+                    return;
                 }
                 using (OutPacket oPacket = new OutPacket("ChCreateRoomReplyPacket"))
                 {
@@ -595,6 +596,7 @@ public static class MultyPlayer
                 if (player == null)
                 {
                     Console.WriteLine("CreateRoom Failed");
+                    return;
                 }
                 using (OutPacket oPacket = new OutPacket("ChCreateRoomReplyPacket"))
                 {
@@ -611,7 +613,14 @@ public static class MultyPlayer
                 Room.Lock = true;
             }
             Room.LockPwd = Password;
-            Room.SpeedType = StartTimeAttack[nickname];
+            if (StartTimeAttack.ContainsKey(nickname))
+            {
+                Room.SpeedType = StartTimeAttack[nickname];
+            }
+            else
+            {
+                Room.SpeedType = 7;
+            }
             Room.GameType = GameType;
             Room.RandomTrackGameType = randomTrackGameType;
             Room.RoomData = RoomData;
