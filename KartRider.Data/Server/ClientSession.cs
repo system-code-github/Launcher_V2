@@ -1431,7 +1431,10 @@ namespace KartRider
                         using (OutPacket outPacket = new OutPacket("PcSlaveNotice"))
                         {
                             outPacket.WriteString($"{Nickname} / {RandomTrack.GetTrackName(ProfileService.ProfileConfigs[Nickname].Rider.Track)} / {min}:{sec}:{mil}");
-                            this.Parent.Client.Send(outPacket);
+                            foreach (SessionGroup Session in ClientManager._clientSessions.Values)
+                            {
+                                Session.Client.Send(outPacket);
+                            }
                         }
                         ProfileService.Save(Nickname);
                         return;
