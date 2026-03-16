@@ -57,6 +57,16 @@ public static class RoomManager
         if (_playerRoomMap.ContainsKey(nickname))
             return 255;
 
+        // 确保玩家配置文件已加载
+        if (!Profile.FileName.FileNames.ContainsKey(nickname))
+        {
+            Profile.FileName.Load(nickname);
+        }
+        if (!Profile.ProfileService.ProfileConfigs.ContainsKey(nickname))
+        {
+            Profile.ProfileService.Load(nickname);
+        }
+
         // 存储原始昵称
         byte added = room.TryAddPlayer(nickname, team, playerType, client);
         if (added != 255)
