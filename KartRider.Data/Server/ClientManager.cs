@@ -23,7 +23,7 @@ public class ClientGroup
 public static class ClientManager
 {
     // 线程安全的集合，存储所有客户端会话（键：客户端唯一标识，值：会话对象）
-    private static readonly ConcurrentDictionary<string, SessionGroup> _clientSessions = new ConcurrentDictionary<string, SessionGroup>();
+    public static readonly ConcurrentDictionary<string, SessionGroup> _clientSessions = new ConcurrentDictionary<string, SessionGroup>();
     public static ConcurrentDictionary<string, ClientGroup> ClientGroups = new ConcurrentDictionary<string, ClientGroup>();
 
     // 添加客户端会话
