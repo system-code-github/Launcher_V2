@@ -159,7 +159,7 @@ namespace KartRider
 
         private void GitHub_Click(object sender, EventArgs e)
         {
-            string url = "https://github.com/yanygm/Launcher_V2/releases";
+            string url = "https://yanygm.github.io/Launcher_V2/";
             try
             {
                 Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });

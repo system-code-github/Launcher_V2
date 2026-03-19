@@ -55,7 +55,7 @@ namespace KartRider
                 outPacket.WriteUShort(ProfileService.SettingConfig.LocaleID);
                 outPacket.WriteUShort(1);
                 outPacket.WriteUShort(ProfileService.SettingConfig.ClientVersion);
-                outPacket.WriteString("https://github.com/yanygm/Launcher_V2");
+                outPacket.WriteString("https://yanygm.github.io/Launcher_V2/");
                 outPacket.WriteUInt(key.first_val);
                 outPacket.WriteUInt(key.second_val);
                 outPacket.WriteByte((byte)ProfileService.SettingConfig.nClientLoc);

@@ -448,7 +448,7 @@ namespace KartRider
                         }
                         using (OutPacket outPacket = new OutPacket("PcSlaveNotice"))
                         {
-                            outPacket.WriteString("单机版完全免费, GitHub: https://github.com/yanygm/Launcher_V2");
+                            outPacket.WriteString("单机版完全免费, https://yanygm.github.io/Launcher_V2/");
                             this.Parent.Client.Send(outPacket);
                         }
                         return;
@@ -2515,7 +2515,7 @@ namespace KartRider
                     {
                         using (OutPacket outPacket = new OutPacket("PrShopCashPage"))
                         {
-                            outPacket.WriteString("https://github.com/yanygm/Launcher_V2/releases");
+                            outPacket.WriteString("https://yanygm.github.io/Launcher_V2/");
                             this.Parent.Client.Send(outPacket);
                         }
                         return;
@@ -2526,7 +2526,7 @@ namespace KartRider
                         using (OutPacket outPacket = new OutPacket("PrShopURLPage"))
                         {
                             outPacket.WriteInt(URLPageType);
-                            outPacket.WriteString("https://github.com/yanygm/Launcher_V2/releases");
+                            outPacket.WriteString("https://yanygm.github.io/Launcher_V2/");
                             this.Parent.Client.Send(outPacket);
                         }
                         return;
@@ -2886,7 +2886,7 @@ namespace KartRider
                             outPacket.WriteString("enable");
                             outPacket.WriteString("false");
                             outPacket.WriteString("value");
-                            outPacket.WriteString("https://github.com/yanygm/Launcher_V2/releases");
+                            outPacket.WriteString("https://yanygm.github.io/Launcher_V2/");
                             outPacket.WriteInt(0);
                             outPacket.WriteString("content");
                             outPacket.WriteInt(0);

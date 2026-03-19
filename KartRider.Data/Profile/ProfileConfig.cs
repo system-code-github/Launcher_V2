@@ -97,7 +97,7 @@ namespace Profile
 
         public string ClubName { get; set; } = "TCCstar";
 
-        public string ClubIntro { get; set; } = "跑跑卡丁车交流群：84338611\n单机启动器下载地址：https://github.com/yanygm/Launcher_V2/releases";
+        public string ClubIntro { get; set; } = "跑跑卡丁车交流群：84338611\n单机启动器下载地址：https://yanygm.github.io/Launcher_V2/";
 
         public string RiderIntro { get; set; } = "";
 
