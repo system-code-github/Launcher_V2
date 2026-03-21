@@ -48,8 +48,6 @@ namespace KartRider
                 IPEndPoint serverEndPoint = Parent.Client.Socket.LocalEndPoint as IPEndPoint;
                 if (serverEndPoint == null) return;
                 string clientId = ClientManager.GetClientId(clientEndPoint);
-                Console.WriteLine($"client: {clientId}");
-                Console.WriteLine($"server: {serverEndPoint.Address}:{serverEndPoint.Port}");
                 var ClientGroup = ClientManager.ClientGroups[clientId];
                 string Nickname = ClientGroup.Nickname;
 
