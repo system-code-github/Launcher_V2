@@ -441,7 +441,7 @@ public static class MultyPlayer
             {
                 return;
             }
-            int slot = iPacket.ReadInt();
+            int id = iPacket.ReadInt();
             uint item = iPacket.ReadUInt();
             byte type = iPacket.ReadByte();
             if (item == uint.MaxValue && iPacket.Length == 77)
@@ -456,7 +456,7 @@ public static class MultyPlayer
                 short skill = GameSupport.RandomItemSkill(nickname, room.GameType);
                 using (OutPacket oPacket = new OutPacket("GameSlotPacket"))
                 {
-                    oPacket.WriteInt(slot);
+                    oPacket.WriteInt(id);
                     oPacket.WriteUInt(item);
                     oPacket.WriteByte(type);
                     oPacket.WriteBytes(data1);
@@ -476,7 +476,7 @@ public static class MultyPlayer
                 List<short> skills = V2Specs.GetSkills(nickname);
                 if (skills.Contains(13) && skill == 3)
                 {
-                    GameSupport.AttackedSkill(roomId, slot, nickname, type, uni, 10);
+                    GameSupport.AttackedSkill(roomId, id, nickname, type, uni, 10);
                 }
                 
                 // Ensure profile is loaded before accessing
@@ -486,7 +486,7 @@ public static class MultyPlayer
                     {
                         if (kartSkills.TryGetValue(skill, out var targetSkill))
                         {
-                            GameSupport.AttackedSkill(roomId, slot, nickname, type, uni, targetSkill);
+                            GameSupport.AttackedSkill(roomId, id, nickname, type, uni, targetSkill);
                         }
                     }
                 }
@@ -501,7 +501,7 @@ public static class MultyPlayer
                 List<short> skills = V2Specs.GetSkills(nickname);
                 if (skills.Contains(14) && skill == 5)
                 {
-                    GameSupport.AddItemSkill(roomId, slot, nickname, 6);
+                    GameSupport.AddItemSkill(roomId, id, nickname, 6);
                 }
                 
                 // Ensure profile is loaded before accessing
@@ -511,7 +511,7 @@ public static class MultyPlayer
                     {
                         if (kartSkills.TryGetValue(skill, out var targetSkill))
                         {
-                            GameSupport.AddItemSkill(roomId, slot, nickname, targetSkill);
+                            GameSupport.AddItemSkill(roomId, id, nickname, targetSkill);
                         }
                     }
                 }
